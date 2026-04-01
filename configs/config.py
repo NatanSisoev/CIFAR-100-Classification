@@ -1,0 +1,6 @@
+INPUT_SIZE = (32, 32)
+BATCH_SIZE = 128
+NUM_EPOCHS = 200
+MEAN = [0.5071, 0.4867, 0.4408]
+STD = [0.2675, 0.2565, 0.2761]
+BASE_DIR = "/content/drive/MyDrive/XNAP/"

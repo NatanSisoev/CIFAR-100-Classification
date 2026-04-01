@@ -2,8 +2,10 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 
-from .base import BaseModel
-from configs import NUM_CLASSES
+from loguru import logger
+
+from configs import NUM_EPOCHS, LEARNING_RATE, MOMENTUM, WEIGHT_DECAY, NUM_CLASSES
+from .utils import count_parameters
 
 
 class ResidualBlock(nn.Module):
@@ -21,19 +23,32 @@ class ResidualBlock(nn.Module):
         super().__init__()
 
         self.block = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, kernel_size=3,
-                      stride=stride, padding=1, bias=False),
+            nn.Conv2d(
+                in_channels,
+                out_channels,
+                kernel_size=3,
+                stride=stride,
+                padding=1,
+                bias=False,
+            ),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
-            nn.Conv2d(out_channels, out_channels, kernel_size=3,
-                      stride=1, padding=1, bias=False),
+            nn.Conv2d(
+                out_channels,
+                out_channels,
+                kernel_size=3,
+                stride=1,
+                padding=1,
+                bias=False,
+            ),
             nn.BatchNorm2d(out_channels),
         )
 
         if stride != 1 or in_channels != out_channels:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(in_channels, out_channels, kernel_size=1,
-                          stride=stride, bias=False),
+                nn.Conv2d(
+                    in_channels, out_channels, kernel_size=1, stride=stride, bias=False
+                ),
                 nn.BatchNorm2d(out_channels),
             )
         else:
@@ -45,7 +60,7 @@ class ResidualBlock(nn.Module):
         return self.relu(self.block(x) + self.shortcut(x))
 
 
-class SmallResNet(BaseModel):
+class SmallResNet(nn.Module):
     """
     Lightweight ResNet for CIFAR-100 (~100K parameters).
 
@@ -70,7 +85,7 @@ class SmallResNet(BaseModel):
         )
 
         self.stage1 = nn.Sequential(
-            ResidualBlock(BASE,     BASE * 2, stride=1),
+            ResidualBlock(BASE, BASE * 2, stride=1),
             ResidualBlock(BASE * 2, BASE * 2, stride=1),
         )
         self.stage2 = nn.Sequential(
@@ -81,9 +96,9 @@ class SmallResNet(BaseModel):
             ResidualBlock(BASE * 4, BASE * 8, stride=2),
         )
 
-        self.pool    = nn.AdaptiveAvgPool2d(1)
+        self.pool = nn.AdaptiveAvgPool2d(1)
         self.dropout = nn.Dropout(0.3)
-        self.fc      = nn.Linear(BASE * 8, num_classes)
+        self.fc = nn.Linear(BASE * 8, num_classes)
 
         self._init_weights()
 
@@ -107,3 +122,72 @@ class SmallResNet(BaseModel):
         x = torch.flatten(x, 1)
         x = self.dropout(x)
         return self.fc(x)
+
+    @classmethod
+    def init(cls, device, **kwargs):
+        model = cls(**kwargs).to(device)
+        criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
+        optimizer = torch.optim.SGD(
+            model.parameters(),
+            lr=LEARNING_RATE,
+            momentum=MOMENTUM,
+            weight_decay=WEIGHT_DECAY,
+            nesterov=True,
+        )
+        
+        warmup  = torch.optim.lr_scheduler.LinearLR(
+            optimizer, start_factor=0.1, total_iters=5
+        )
+        cosine  = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=NUM_EPOCHS - 5
+        )
+        scheduler = torch.optim.lr_scheduler.SequentialLR(
+            optimizer, schedulers=[warmup, cosine], milestones=[5]
+        )
+
+        logger.info(f"Initiated {cls.__name__} with {count_parameters(model):,} params")
+
+        return model, criterion, optimizer, scheduler
+
+    @classmethod
+    def restore(cls, device, save_path, **kwargs):
+        checkpoint = torch.load(save_path, map_location=device)
+
+        model = cls(**kwargs).to(device)
+        model.load_state_dict(checkpoint["model_state"])
+
+        criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
+        optimizer = torch.optim.SGD(
+            model.parameters(),
+            lr=LEARNING_RATE,
+            momentum=MOMENTUM,
+            weight_decay=WEIGHT_DECAY,
+            nesterov=True,
+        )
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=checkpoint["t_max"]
+        )
+
+        optimizer.load_state_dict(checkpoint["optimizer_state"])
+        scheduler.load_state_dict(checkpoint["scheduler_state"])
+
+        start_epoch = checkpoint["epoch"] + 1
+        best_test_acc = checkpoint["best_test_acc"]
+        history = checkpoint["history"]
+
+        logger.info(
+            f"Restored {cls.__name__} from '{save_path}' "
+            f"(epoch {start_epoch}, best acc {best_test_acc:.2f}%)"
+        )
+
+        return {
+            "model": model,
+            "criterion": criterion,
+            "optimizer": optimizer,
+            "scheduler": scheduler,
+            "history": history,
+            "best_test_acc": best_test_acc,
+            "start_epoch": start_epoch,
+            "save_path": save_path,
+            "resumed": True,
+        }

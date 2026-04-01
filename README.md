@@ -35,6 +35,16 @@ CIFAR-100-Classification/
 
 ---
 
+## References
+
+- Howard, A. G., Zhu, M., Chen, B., Kalenichenko, D., Wang, W., Weyand, T., Andreetto, M., & Adam, H. (2017). MobileNets: Efficient convolutional neural networks for mobile vision applications. arXiv. https://arxiv.org/abs/1704.04861
+- Hu, J., Shen, L., Albanie, S., Sun, G., & Wu, E. (2017). Squeeze-and-Excitation Networks. arXiv. https://arxiv.org/abs/1709.01507
+- Woo, S., Park, J., Lee, J.-Y., & Kweon, I. S. (2018). CBAM: Convolutional block attention module. arXiv. https://arxiv.org/abs/1807.06521
+- Yun, S., Han, D., Oh, S. J., Chun, S., Choe, J., & Yoo, Y. (2019). CutMix: Regularization strategy to train strong classifiers with localizable features. arXiv. https://arxiv.org/abs/1905.04899
+- Müller, S. G., & Hutter, F. (2021). TrivialAugment: Tuning-free yet state-of-the-art data augmentation. arXiv. https://arxiv.org/abs/2103.10158
+
+---
+
 ## Author
 
 Natan Sisoev

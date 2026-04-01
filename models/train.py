@@ -4,6 +4,9 @@ import torch
 import torch.nn as nn
 from loguru import logger
 from torch.utils.data import DataLoader
+import torchvision.transforms.v2 as transforms
+from .utils import plot_history
+from configs import NUM_CLASSES
 
 from models.utils import count_parameters
 
@@ -19,52 +22,54 @@ def train(
     scheduler: torch.optim.lr_scheduler.LRScheduler,
     num_epochs: int,
     save_path: str,
+    grad_clip: float = 1.0,     # max gradient L2 norm; set None to disable
     resumed: bool = False,
     **kwargs,
 ) -> tuple[nn.Module, dict]:
 
     n_params = count_parameters(model)
+    logger.info(f"Training {'resumed' if resumed else 'started'} — {n_params:,} parameters")
 
     if not resumed:
-        logger.info(f"Training started — {n_params:,} trainable parameters")
-        history = {
-            "train_loss": [],
-            "test_loss": [],
-            "train_acc": [],
-            "test_acc": [],
-        }
+        history = {"train_loss": [], "test_loss": [], "train_acc": [], "test_acc": []}
         best_test_acc = 0.0
         init_epoch = 0
     else:
-        logger.info(f"Training resumed — {n_params:,} trainable parameters")
         history = kwargs["history"]
         best_test_acc = kwargs["best_test_acc"]
         init_epoch = kwargs["start_epoch"]
+    
+    cutmix = transforms.CutMix(num_classes=NUM_CLASSES)
+    mixup = transforms.MixUp(num_classes=NUM_CLASSES)
+    no_aug = transforms.Lambda(lambda x, y: (x, y))
+    aug = transforms.RandomChoice([cutmix, mixup, no_aug])
 
     init_time = time.time()
 
     for epoch in range(init_epoch, num_epochs):
-        for phase in ["train", "test"]:
+        for phase in ("train", "test"):
             is_train = phase == "train"
             loader = dataloader_train if is_train else dataloader_test
 
             model.train() if is_train else model.eval()
 
-            running_loss = 0.0
-            correct = 0
-            total = 0
+            running_loss = correct = total = 0.0
 
             for images, labels in loader:
                 images, labels = images.to(device), labels.to(device)
                 optimizer.zero_grad()
 
                 with torch.set_grad_enabled(is_train):
+                    images, labels = aug(images, labels)
                     outputs = model(images)
                     loss = criterion(outputs, labels)
+
                     _, preds = torch.max(outputs, 1)
 
                     if is_train:
                         loss.backward()
+                        if grad_clip is not None:
+                            nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
                         optimizer.step()
 
                 running_loss += loss.item() * images.size(0)
@@ -101,11 +106,9 @@ def train(
                 )
 
         scheduler.step()
+        plot_history(history)
 
     elapsed = time.time() - init_time
-    logger.info(
-        f"Training finished in {elapsed / 60:.1f} min | "
-        f"Best test acc: {best_test_acc:.2f}%"
-    )
+    logger.info(f"Finished in {elapsed/60:.1f} min | Best: {best_test_acc:.2f}%")
 
     return model, history

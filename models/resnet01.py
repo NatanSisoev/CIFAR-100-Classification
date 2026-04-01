@@ -3,7 +3,7 @@ from torch import Tensor
 import torch
 from .utils import count_parameters
 from loguru import logger
-from configs import NUM_EPOCHS, BASE_DIR
+from configs import NUM_EPOCHS, REMOTE_BASE_DIR
 
 
 class ResidualBlock(nn.Module):
@@ -151,7 +151,7 @@ def resume_smallresnet(
     num_classes,
     device,
     num_epochs: int = NUM_EPOCHS,
-    save_path: str = BASE_DIR + "best_model.pth",
+    save_path: str = REMOTE_BASE_DIR + "best_model.pth",
 ):
     checkpoint = torch.load(save_path, map_location=device)
 

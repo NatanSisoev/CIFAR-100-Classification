@@ -2,6 +2,7 @@ from torchvision.datasets import CIFAR100
 from torch.utils.data import DataLoader
 from .transforms import get_train_transforms, get_test_transforms
 from configs import BATCH_SIZE
+from loguru import logger
 
 
 def get_cifar100_loaders():
@@ -14,5 +15,8 @@ def get_cifar100_loaders():
 
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
+
+    logger.info("Succesfully loaded train loader.")
+    logger.info("Succesfully loaded test loader.")
 
     return train_loader, test_loader

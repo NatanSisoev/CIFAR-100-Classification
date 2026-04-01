@@ -1,7 +1,7 @@
 import torch.nn as nn
-from configs import BASE_DIR
-
-from matlplotlib import pyplot as plt
+from configs import REMOTE_BASE_DIR
+import torch
+from matplotlib import pyplot as plt
 from loguru import logger
 
 
@@ -10,7 +10,7 @@ def count_parameters(model: nn.Module) -> int:
 
 
 def plot_history(
-    history: dict, save_path: str = BASE_DIR + "training_history.png"
+    history: dict, save_path: str = REMOTE_BASE_DIR + "training_history.png"
 ) -> None:
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
@@ -35,3 +35,14 @@ def plot_history(
     plt.savefig(save_path, dpi=150)
     plt.show()
     logger.info(f"Training plot saved to '{save_path}'")
+
+def get_device():
+    torch.backends.cudnn.benchmark = True
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+    if str(device) == "cpu":
+        logger.warning(f"using device: {device}")
+    elif "cuda" in str(device):
+        logger.success(f"using device: {device}")
+    
+    return device

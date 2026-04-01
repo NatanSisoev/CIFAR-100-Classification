@@ -4,8 +4,9 @@ import torch.nn as nn
 import torch
 from loguru import logger
 from torch.utils.data import DataLoader
+from google.colab import drive
 
-from configs import BASE_DIR
+from configs import REMOTE_BASE_DIR
 from models import count_parameters, plot_history
 
 
@@ -19,10 +20,12 @@ def train(
     optimizer: torch.optim.Optimizer,
     scheduler: torch.optim.lr_scheduler.LRScheduler,
     num_epochs: int = 50,
-    save_path: str = BASE_DIR + "best_model.pth",
+    save_path: str = REMOTE_BASE_DIR + "best_model.pth",
     resumed: bool = False,
     **kwargs,
 ) -> tuple[nn.Module, dict]:
+    drive.mount("/content/drive")
+
     n_params = count_parameters(model)
 
     if not resumed:

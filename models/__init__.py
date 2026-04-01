@@ -1,4 +1,11 @@
+from .base import BaseModel
 from .resnet01 import SmallResNet
-from .utils import count_parameters, plot_history
+from .utils import count_parameters, plot_history, get_device
 
-__all__ = ["SmallResNet", "init_smallresnet", "count_parameters", "plot_history"]
+__all__ = [
+    "BaseModel",
+    "SmallResNet",
+    "count_parameters",
+    "plot_history",
+    "get_device",
+]

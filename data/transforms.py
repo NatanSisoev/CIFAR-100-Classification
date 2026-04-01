@@ -1,9 +1,9 @@
 import torchvision.transforms as transforms
 from configs import INPUT_SIZE, MEAN, STD
 
-
-def get_train_transforms():
-    return transforms.Compose(
+LATEST_VERSION = "v1"
+TRAIN_TRANSFORMS = {
+    "v1": transforms.Compose(
         [
             transforms.RandomCrop(INPUT_SIZE[0], padding=4),
             transforms.RandomHorizontalFlip(),
@@ -15,6 +15,11 @@ def get_train_transforms():
             transforms.Normalize(MEAN, STD),
         ]
     )
+}
+
+
+def get_train_transforms(version: str = None):
+    return TRAIN_TRANSFORMS.get(version or LATEST_VERSION)
 
 
 def get_test_transforms():

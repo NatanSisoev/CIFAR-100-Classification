@@ -1,7 +1,7 @@
 from torchvision.datasets import CIFAR100
 from torch.utils.data import DataLoader
 from .transforms import get_train_transforms, get_test_transforms
-from configs.config import BATCH_SIZE
+from configs import BATCH_SIZE
 
 
 def get_cifar100_loaders():

@@ -16,42 +16,23 @@ CIFAR-100-Classification/
 │   └── transforms.py      # Data augmentation / preprocessing (CutMix, normalization, etc.)
 │
 ├── models/
-│   └── resnet01.py        # SmallResNet and ResidualBlock definitions
+│   └── resnet01.py        # first acrhitecture
 │
 ├── training/
-│   ├── train.py           # Training loop
-│   ├── evaluate.py        # Evaluation utilities
-│   └── utils.py           # Metrics, helpers
+│   └── train01.py         # first acrhitecture
 │
 ├── configs/
 │   └── config.py          # Hyperparameters and constants
 │
 ├── notebooks/
-│   └── experiments.ipynb  # Optional experimentation
+│   └── model01.ipynb      # first acrhitecture
+│
+├── results/               # plots with the results
 │
 ├── requirements.txt
 ├── README.md
-└── main.py                # Entry point
-```
-
----
-
-## Installation
-
-```bash
-git clone <repo-url>
-cd CIFAR-100-Classification
-pip install -r requirements.txt
-```
-
----
-
-## Usage
-
-### Train the model
-
-```bash
-python main.py
+├── all_in_one.py          # All codebase without local imports
+└── gather.py              # Gather all codebase (for colab initial cell)
 ```
 
 ---

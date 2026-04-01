@@ -1,6 +1,9 @@
 import torch.nn as nn
 from torch import Tensor
 import torch
+from .utils import count_parameters
+from loguru import logger
+from configs import NUM_EPOCHS, BASE_DIR
 
 
 class ResidualBlock(nn.Module):
@@ -125,3 +128,64 @@ class SmallResNet(nn.Module):
         x = self.dropout(x)
         x = self.fc(x)  #                 → (B, 100)
         return x
+
+
+def init_smallresnet(device):
+    net = SmallResNet().to(device)
+    n = count_parameters(net)
+    criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
+    optimizer = torch.optim.SGD(
+        net.parameters(),
+        lr=0.1,
+        momentum=0.9,
+        weight_decay=5e-4,
+        nesterov=True,
+    )
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=NUM_EPOCHS)
+    logger.info(f"{n:,} parameters")
+
+    return net, criterion, optimizer, scheduler
+
+
+def resume_smallresnet(
+    num_classes,
+    device,
+    num_epochs: int = NUM_EPOCHS,
+    save_path: str = BASE_DIR + "best_model.pth",
+):
+    checkpoint = torch.load(save_path, map_location=device)
+
+    net = SmallResNet(num_classes=num_classes).to(device)
+    net.load_state_dict(checkpoint["model_state"])
+
+    criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
+    optimizer = torch.optim.SGD(
+        net.parameters(),
+        lr=0.1,
+        momentum=0.9,
+        weight_decay=5e-4,
+        nesterov=True,
+    )
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer, T_max=checkpoint["t_max"]
+    )
+
+    optimizer.load_state_dict(checkpoint["optimizer_state"])
+    scheduler.load_state_dict(checkpoint["scheduler_state"])
+
+    start_epoch = checkpoint["epoch"] + 1
+    best_test_acc = checkpoint["best_test_acc"]
+    history = checkpoint["history"]
+
+    return {
+        "model": net,
+        "criterion": criterion,
+        "optimizer": optimizer,
+        "scheduler": scheduler,
+        "num_epochs": num_epochs,
+        "history": history,
+        "best_test_acc": best_test_acc,
+        "start_epoch": start_epoch,
+        "save_path": save_path,
+        "resumed": True,
+    }

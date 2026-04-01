@@ -1,6 +1,3 @@
-# Gathered codebase
-all_in_one.py
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

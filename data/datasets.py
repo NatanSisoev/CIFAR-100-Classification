@@ -16,7 +16,7 @@ def get_cifar100_loaders():
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
-    logger.info("Succesfully loaded train loader.")
-    logger.info("Succesfully loaded test loader.")
+    logger.success("Succesfully loaded train loader.")
+    logger.success("Succesfully loaded test loader.")
 
     return train_loader, test_loader

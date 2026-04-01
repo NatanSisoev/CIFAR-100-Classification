@@ -9,7 +9,6 @@ from .config import (
     STD,
     REMOTE_BASE_DIR,
     NUM_CLASSES,
-    CLASSES,
 )
 
 __all__ = [
@@ -23,5 +22,4 @@ __all__ = [
     "STD",
     "REMOTE_BASE_DIR",
     "NUM_CLASSES",
-    "CLASSES",
 ]

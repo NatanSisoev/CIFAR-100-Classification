@@ -1,17 +1,18 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from torchvision.datasets import VisionDataset
+from torchvision.data import DataLoader
 from configs import MEAN, STD
 
 
 def visualize_images(
-    dataset: VisionDataset,
+    dataloader: DataLoader,
     imgs: tuple[int, int] = (3, 5),
     show_label: bool = True,
     seed: int | None = None,
     category: int | str | None = None,
 ) -> None:
     rng = np.random.default_rng(seed)
+    dataset = dataloader.dataset
     classes = dataset.classes
 
     rows, cols = imgs

@@ -5,7 +5,6 @@ import torch.nn as nn
 from loguru import logger
 from torch.utils.data import DataLoader
 
-from configs import REMOTE_BASE_DIR, NUM_EPOCHS
 from models.utils import count_parameters
 
 
@@ -18,8 +17,8 @@ def train(
     criterion: nn.Module,
     optimizer: torch.optim.Optimizer,
     scheduler: torch.optim.lr_scheduler.LRScheduler,
-    num_epochs: int = NUM_EPOCHS,
-    save_path: str = REMOTE_BASE_DIR + "best_model.pth",
+    num_epochs: int,
+    save_path: str,
     resumed: bool = False,
     **kwargs,
 ) -> tuple[nn.Module, dict]:
@@ -30,30 +29,30 @@ def train(
         logger.info(f"Training started — {n_params:,} trainable parameters")
         history = {
             "train_loss": [],
-            "test_loss":  [],
-            "train_acc":  [],
-            "test_acc":   [],
+            "test_loss": [],
+            "train_acc": [],
+            "test_acc": [],
         }
         best_test_acc = 0.0
         init_epoch = 0
     else:
         logger.info(f"Training resumed — {n_params:,} trainable parameters")
-        history       = kwargs["history"]
+        history = kwargs["history"]
         best_test_acc = kwargs["best_test_acc"]
-        init_epoch    = kwargs["start_epoch"]
+        init_epoch = kwargs["start_epoch"]
 
     init_time = time.time()
 
     for epoch in range(init_epoch, num_epochs):
         for phase in ["train", "test"]:
             is_train = phase == "train"
-            loader   = dataloader_train if is_train else dataloader_test
+            loader = dataloader_train if is_train else dataloader_test
 
             model.train() if is_train else model.eval()
 
             running_loss = 0.0
-            correct      = 0
-            total        = 0
+            correct = 0
+            total = 0
 
             for images, labels in loader:
                 images, labels = images.to(device), labels.to(device)
@@ -61,7 +60,7 @@ def train(
 
                 with torch.set_grad_enabled(is_train):
                     outputs = model(images)
-                    loss    = criterion(outputs, labels)
+                    loss = criterion(outputs, labels)
                     _, preds = torch.max(outputs, 1)
 
                     if is_train:
@@ -69,11 +68,11 @@ def train(
                         optimizer.step()
 
                 running_loss += loss.item() * images.size(0)
-                correct      += preds.eq(labels).sum().item()
-                total        += images.size(0)
+                correct += preds.eq(labels).sum().item()
+                total += images.size(0)
 
             epoch_loss = running_loss / total
-            epoch_acc  = correct / total * 100
+            epoch_acc = correct / total * 100
 
             history[f"{phase}_loss"].append(epoch_loss)
             history[f"{phase}_acc"].append(epoch_acc)
@@ -87,13 +86,13 @@ def train(
                 best_test_acc = epoch_acc
                 torch.save(
                     {
-                        "epoch":           epoch,
-                        "model_state":     model.state_dict(),
+                        "epoch": epoch,
+                        "model_state": model.state_dict(),
                         "optimizer_state": optimizer.state_dict(),
                         "scheduler_state": scheduler.state_dict(),
-                        "t_max":           scheduler.T_max,
-                        "best_test_acc":   best_test_acc,
-                        "history":         history,
+                        "t_max": scheduler.T_max,
+                        "best_test_acc": best_test_acc,
+                        "history": history,
                     },
                     save_path,
                 )

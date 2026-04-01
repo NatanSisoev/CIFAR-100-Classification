@@ -11,6 +11,10 @@ This project implements a lightweight Residual Network (ResNet-style) for image 
 ```
 CIFAR-100-Classification/
 │
+├── data/
+│   ├── datasets.py        # Dataset loading (CIFAR-100, custom datasets)
+│   └── transforms.py      # Data augmentation / preprocessing (CutMix, normalization, etc.)
+│
 ├── models/
 │   └── resnet01.py        # SmallResNet and ResidualBlock definitions
 │

@@ -65,9 +65,9 @@ def train(
                     #    images, labels = aug(images, labels)
                     outputs = model(images)
 
-                    logger.info("outputs.shape:", outputs.shape)  # should be [batch_size, NUM_CLASSES]
-                    logger.info("labels.shape:", labels.shape)    # should be [batch_size]
-                    logger.info("labels.dtype:", labels.dtype)    # should be torch.int64
+                    logger.info(f"outputs.shape: {outputs.shape}")
+                    logger.info(f"labels.shape: {labels.shape}")
+                    logger.info(f"labels.dtype: {labels.dtype}")
                     
                     loss = criterion(outputs, labels)
 

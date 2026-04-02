@@ -29,7 +29,7 @@ def train(
 ) -> tuple[nn.Module, dict]:
 
     n_params = count_parameters(model)
-    logger.info(f"Training5 {'resumed' if resumed else 'started'} — {n_params:,} parameters")
+    logger.info(f"Training6 {'resumed' if resumed else 'started'} — {n_params:,} parameters")
 
     if not resumed:
         history = {"train_loss": [], "test_loss": [], "train_acc": [], "test_acc": []}
@@ -75,6 +75,7 @@ def train(
                         optimizer.step()
 
                 running_loss += loss.item() * images.size(0)
+                logger.info(f"{preds.shape=}, {labels.shape=}")
                 correct += preds.eq(labels).sum().item()
                 total += images.size(0)
 

@@ -64,6 +64,11 @@ def train(
                     #if train:
                     #    images, labels = aug(images, labels)
                     outputs = model(images)
+
+                    print("outputs.shape:", outputs.shape)  # should be [batch_size, NUM_CLASSES]
+                    print("labels.shape:", labels.shape)    # should be [batch_size]
+                    print("labels.dtype:", labels.dtype)    # should be torch.int64
+                    
                     loss = criterion(outputs, labels)
 
                     _, preds = torch.max(outputs, 1)
@@ -74,9 +79,7 @@ def train(
                         #    nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
                         optimizer.step()
                 
-                print("outputs.shape:", outputs.shape)  # should be [batch_size, NUM_CLASSES]
-                print("labels.shape:", labels.shape)    # should be [batch_size]
-                print("labels.dtype:", labels.dtype)    # should be torch.int64
+                
 
                 running_loss += loss.item() * images.size(0)
                 correct += preds.eq(labels).sum().item()

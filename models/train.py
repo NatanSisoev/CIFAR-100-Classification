@@ -73,6 +73,10 @@ def train(
                         #if grad_clip is not None:
                         #    nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
                         optimizer.step()
+                
+                print("outputs.shape:", outputs.shape)  # should be [batch_size, NUM_CLASSES]
+                print("labels.shape:", labels.shape)    # should be [batch_size]
+                print("labels.dtype:", labels.dtype)    # should be torch.int64
 
                 running_loss += loss.item() * images.size(0)
                 correct += preds.eq(labels).sum().item()

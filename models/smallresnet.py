@@ -135,14 +135,8 @@ class SmallResNet(nn.Module):
             nesterov=True,
         )
         
-        warmup  = torch.optim.lr_scheduler.LinearLR(
-            optimizer, start_factor=0.1, total_iters=5
-        )
-        cosine  = torch.optim.lr_scheduler.CosineAnnealingLR(
-            optimizer, T_max=NUM_EPOCHS - 5
-        )
-        scheduler = torch.optim.lr_scheduler.SequentialLR(
-            optimizer, schedulers=[warmup, cosine], milestones=[5]
+        scheduler  = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=NUM_EPOCHS
         )
 
         logger.info(f"Initiated {cls.__name__} with {count_parameters(model):,} params")

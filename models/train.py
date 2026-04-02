@@ -56,11 +56,6 @@ def train(
 
                 with torch.set_grad_enabled(is_train):
                     outputs = model(images)
-
-                    logger.info(f"outputs.shape: {outputs.shape}")
-                    logger.info(f"labels.shape: {labels.shape}")
-                    logger.info(f"labels.dtype: {labels.dtype}")
-                    
                     loss = criterion(outputs, labels)
 
                     _, preds = torch.max(outputs, 1)

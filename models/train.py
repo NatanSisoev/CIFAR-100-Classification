@@ -67,7 +67,6 @@ def train(
                     loss = criterion(outputs, labels)
 
                     _, preds = torch.max(outputs, 1)
-                    label_indices = labels.argmax(1) if labels.dim() == 2 else labels
 
                     if is_train:
                         loss.backward()
@@ -76,7 +75,7 @@ def train(
                         optimizer.step()
 
                 running_loss += loss.item() * images.size(0)
-                correct += preds.eq(label_indices).sum().item()
+                correct += preds.eq(labels).sum().item()
                 total += images.size(0)
 
             epoch_loss = running_loss / total

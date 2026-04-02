@@ -29,7 +29,7 @@ def train(
 ) -> tuple[nn.Module, dict]:
 
     n_params = count_parameters(model)
-    logger.info(f"Training3 {'resumed' if resumed else 'started'} — {n_params:,} parameters")
+    logger.info(f"Training4 {'resumed' if resumed else 'started'} — {n_params:,} parameters")
 
     if not resumed:
         history = {"train_loss": [], "test_loss": [], "train_acc": [], "test_acc": []}

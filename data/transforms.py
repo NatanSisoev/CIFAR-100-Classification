@@ -7,10 +7,10 @@ def get_train_transforms(version: str = None):
         [
             transforms.RandomCrop(INPUT_SIZE[0], padding=4),
             transforms.RandomHorizontalFlip(),
+            transforms.RandomErasing(p=0.1),
             transforms.TrivialAugmentWide(),
             transforms.ToTensor(),
             transforms.Normalize(MEAN, STD),
-            transforms.RandomErasing(p=0.1),
         ]
     )
 

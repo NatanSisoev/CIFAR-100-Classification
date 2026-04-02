@@ -75,8 +75,12 @@ def train(
                         optimizer.step()
 
                 running_loss += loss.item() * images.size(0)
-                logger.info(f"{preds.shape=}, {labels.shape=}")
-                correct += preds.eq(labels).sum().item()
+                if labels.ndim == 1:
+                    # normal labels
+                    correct += preds.eq(labels).sum().item()
+                else:
+                    # MixUp / CutMix soft labels
+                    correct += (labels[torch.arange(labels.size(0)), preds] > 0).sum().item()
                 total += images.size(0)
 
             epoch_loss = running_loss / total

@@ -74,7 +74,7 @@ def train(
                             nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
                         optimizer.step()
 
-                running_loss += loss.item() * images.size(0)
+                running_loss += loss.item() * images.size(0) # comment
                 correct += preds.eq(labels).sum().item()
                 total += images.size(0)
 

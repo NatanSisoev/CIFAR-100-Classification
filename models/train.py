@@ -23,7 +23,6 @@ def train(
     num_epochs: int,
     best_save_path: str,
     last_save_path: str,
-    grad_clip: float = 1.0,     # max gradient L2 norm; set None to disable
     resumed: bool = False,
     **kwargs,
 ) -> tuple[nn.Module, dict]:
@@ -39,11 +38,6 @@ def train(
         history = kwargs["history"]
         best_test_acc = kwargs["best_test_acc"]
         init_epoch = kwargs["start_epoch"]
-    
-    cutmix = transforms.CutMix(num_classes=NUM_CLASSES)
-    mixup = transforms.MixUp(num_classes=NUM_CLASSES)
-    no_aug = transforms.Lambda(lambda x, y: (x, y))
-    aug = transforms.RandomChoice([no_aug])
 
     init_time = time.time()
 
@@ -61,8 +55,6 @@ def train(
                 optimizer.zero_grad()
 
                 with torch.set_grad_enabled(is_train):
-                    #if train:
-                    #    images, labels = aug(images, labels)
                     outputs = model(images)
 
                     logger.info(f"outputs.shape: {outputs.shape}")
@@ -75,11 +67,7 @@ def train(
 
                     if is_train:
                         loss.backward()
-                        #if grad_clip is not None:
-                        #    nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
                         optimizer.step()
-                
-                
 
                 running_loss += loss.item() * images.size(0)
                 correct += preds.eq(labels).sum().item()

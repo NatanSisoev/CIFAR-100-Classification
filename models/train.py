@@ -61,7 +61,7 @@ def train(
                 optimizer.zero_grad()
 
                 with torch.set_grad_enabled(is_train):
-                    if is_train:
+                    if is_train == "j":
                         images, labels = aug(images, labels)
                     outputs = model(images)
                     loss = criterion(outputs, labels)

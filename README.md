@@ -17,7 +17,6 @@ CIFAR-100-Classification/
 │   └── utils.py           # Dataset visualization
 │
 ├── models/
-│   ├── base.py            # Base abstract model with `init` and `restore` methods
 │   ├── smallresnet.py     # Small Residual Network
 │   ├── train.py           # Training routine
 │   └── utils.py           # Model parameter count, result visualization and device

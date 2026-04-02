@@ -21,7 +21,8 @@ def train(
     optimizer: torch.optim.Optimizer,
     scheduler: torch.optim.lr_scheduler.LRScheduler,
     num_epochs: int,
-    save_path: str,
+    best_save_path: str,
+    last_save_path: str,
     grad_clip: float = 1.0,     # max gradient L2 norm; set None to disable
     resumed: bool = False,
     **kwargs,
@@ -87,8 +88,7 @@ def train(
                 f"loss: {epoch_loss:.4f} | acc: {epoch_acc:.2f}%"
             )
 
-            if not is_train and epoch_acc > best_test_acc:
-                best_test_acc = epoch_acc
+            if not is_train:
                 torch.save(
                     {
                         "epoch": epoch,
@@ -99,11 +99,29 @@ def train(
                         "best_test_acc": best_test_acc,
                         "history": history,
                     },
-                    save_path,
+                    last_save_path,
                 )
                 logger.info(
-                    f" ★ New best: {best_test_acc:.2f}% — saved to '{save_path}'"
-                )
+                        f"Accuracy: {epoch_acc:.2f}% — saved to '{last_save_path}'"
+                    )
+                
+                if epoch_acc > best_test_acc:
+                    best_test_acc = epoch_acc
+                    torch.save(
+                        {
+                            "epoch": epoch,
+                            "model_state": model.state_dict(),
+                            "optimizer_state": optimizer.state_dict(),
+                            "scheduler_state": scheduler.state_dict(),
+                            "t_max": scheduler.T_max,
+                            "best_test_acc": best_test_acc,
+                            "history": history,
+                        },
+                        best_save_path,
+                    )
+                    logger.info(
+                        f" ★ New best: {best_test_acc:.2f}% — saved to '{best_save_path}'"
+                    )
 
         scheduler.step()
         plot_history(history)

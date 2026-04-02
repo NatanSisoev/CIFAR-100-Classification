@@ -70,11 +70,11 @@ def train(
 
                     if is_train:
                         loss.backward()
-                        if grad_clip is not None:
-                            nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+                        #if grad_clip is not None:
+                        #    nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
                         optimizer.step()
 
-                running_loss += loss.item() * images.size(0) # comment
+                running_loss += loss.item() * images.size(0)
                 correct += preds.eq(labels).sum().item()
                 total += images.size(0)
 

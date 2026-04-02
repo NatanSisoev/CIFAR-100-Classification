@@ -126,7 +126,7 @@ class SmallResNet(nn.Module):
     @classmethod
     def init(cls, device, **kwargs):
         model = cls(**kwargs).to(device)
-        criterion = lambda x, y: nn.functional.corss_entropy(x, y, label_smoothing=0.1)
+        criterion = lambda x, y: nn.functional.cross_entropy(x, y, label_smoothing=0.1)
         optimizer = torch.optim.SGD(
             model.parameters(),
             lr=LEARNING_RATE,

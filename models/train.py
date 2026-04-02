@@ -43,7 +43,7 @@ def train(
     cutmix = transforms.CutMix(num_classes=NUM_CLASSES)
     mixup = transforms.MixUp(num_classes=NUM_CLASSES)
     no_aug = transforms.Lambda(lambda x, y: (x, y))
-    aug = transforms.RandomChoice([cutmix, mixup, no_aug])
+    aug = transforms.RandomChoice([no_aug])
 
     init_time = time.time()
 

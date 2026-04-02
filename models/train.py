@@ -29,7 +29,7 @@ def train(
 ) -> tuple[nn.Module, dict]:
 
     n_params = count_parameters(model)
-    logger.info(f"Training6 {'resumed' if resumed else 'started'} — {n_params:,} parameters")
+    logger.info(f"Training7 {'resumed' if resumed else 'started'} — {n_params:,} parameters")
 
     if not resumed:
         history = {"train_loss": [], "test_loss": [], "train_acc": [], "test_acc": []}
@@ -42,8 +42,7 @@ def train(
     
     cutmix = transforms.CutMix(num_classes=NUM_CLASSES)
     mixup = transforms.MixUp(num_classes=NUM_CLASSES)
-    no_aug = transforms.Lambda(lambda x, y: (x, y))
-    aug = transforms.RandomChoice([cutmix, mixup, no_aug])
+    aug = transforms.RandomChoice([cutmix, mixup], [1/3, 1/3])
 
     init_time = time.time()
 

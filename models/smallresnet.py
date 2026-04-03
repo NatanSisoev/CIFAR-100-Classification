@@ -90,7 +90,7 @@ class SmallResNet(nn.Module):
         )
         self.stage2 = nn.Sequential(
             ResidualBlock(BASE * 2, BASE * 4, stride=2),
-            ResidualBlock(BASE * 4, BASE * 4, stride=2),
+            ResidualBlock(BASE * 4, BASE * 4, stride=1),
         )
         self.stage3 = nn.Sequential(
             ResidualBlock(BASE * 4, BASE * 8, stride=2),

@@ -29,7 +29,7 @@ def train(
 ) -> tuple[nn.Module, dict]:
 
     n_params = count_parameters(model)
-    logger.info(f"Training7 {'resumed' if resumed else 'started'} — {n_params:,} parameters")
+    logger.info(f"Training {'resumed' if resumed else 'started'} — {n_params:,} parameters")
 
     if not resumed:
         history = {"train_loss": [], "test_loss": [], "train_acc": [], "test_acc": []}
@@ -42,7 +42,7 @@ def train(
     
     cutmix = transforms.CutMix(num_classes=NUM_CLASSES)
     mixup = transforms.MixUp(num_classes=NUM_CLASSES)
-    aug = transforms.RandomChoice([cutmix, mixup], [1/3, 1/3])
+    aug = transforms.RandomChoice([cutmix, mixup], [1/5, 1/5])
 
     init_time = time.time()
 
@@ -60,7 +60,7 @@ def train(
                 optimizer.zero_grad()
 
                 with torch.set_grad_enabled(is_train):
-                    if is_train:
+                    if is_train and False:
                         images, labels = aug(images, labels)
                     outputs = model(images)
                     loss = criterion(outputs, labels)

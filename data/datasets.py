@@ -13,8 +13,8 @@ def get_cifar100_loaders():
         root="./data", train=False, download=True, transform=get_test_transforms()
     )
 
-    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, pin_memory=True, num_workers=16)
+    test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, pin_memory=True, num_workers=16)
 
     logger.success("Succesfully loaded train loader.")
     logger.success("Succesfully loaded test loader.")

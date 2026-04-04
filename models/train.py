@@ -23,13 +23,15 @@ def train(
     num_epochs: int,
     best_save_path: str,
     last_save_path: str,
-    grad_clip: float = 1.0,     # max gradient L2 norm; set None to disable
+    grad_clip: float = 1.0,
     resumed: bool = False,
     **kwargs,
 ) -> tuple[nn.Module, dict]:
 
     n_params = count_parameters(model)
-    logger.info(f"Training {'resumed' if resumed else 'started'} — {n_params:,} parameters")
+    logger.info(
+        f"Training {'resumed' if resumed else 'started'} — {n_params:,} parameters"
+    )
 
     if not resumed:
         history = {"train_loss": [], "test_loss": [], "train_acc": [], "test_acc": []}
@@ -39,7 +41,7 @@ def train(
         history = kwargs["history"]
         best_test_acc = kwargs["best_test_acc"]
         init_epoch = kwargs["start_epoch"]
-    
+
     cutmix = transforms.CutMix(num_classes=NUM_CLASSES)
     mixup = transforms.MixUp(num_classes=NUM_CLASSES)
     aug = transforms.RandomChoice([cutmix, mixup], [1/5, 1/5])
@@ -60,7 +62,7 @@ def train(
                 optimizer.zero_grad()
 
                 with torch.set_grad_enabled(is_train):
-                    if is_train and False:
+                    if is_train and kwargs.get("data_augmentation", False):
                         images, labels = aug(images, labels)
                     outputs = model(images)
                     loss = criterion(outputs, labels)
@@ -75,10 +77,8 @@ def train(
 
                 running_loss += loss.item() * images.size(0)
                 if labels.ndim == 1:
-                    # normal labels
                     correct += preds.eq(labels).sum().item()
                 else:
-                    # MixUp / CutMix soft labels
                     correct += (labels[torch.arange(labels.size(0)), preds] > 0).sum().item()
                 total += images.size(0)
 
@@ -105,10 +105,8 @@ def train(
                     },
                     last_save_path,
                 )
-                logger.info(
-                        f"Accuracy: {epoch_acc:.2f}% — saved to '{last_save_path}'"
-                    )
-                
+                logger.info(f"Accuracy: {epoch_acc:.2f}% — saved to '{last_save_path}'")
+
                 if epoch_acc > best_test_acc:
                     best_test_acc = epoch_acc
                     torch.save(
@@ -130,6 +128,6 @@ def train(
         plot_history(history)
 
     elapsed = time.time() - init_time
-    logger.info(f"Finished in {elapsed/60:.1f} min | Best: {best_test_acc:.2f}%")
+    logger.info(f"Finished in {elapsed / 60:.1f} min | Best: {best_test_acc:.2f}%")
 
     return model, history

@@ -125,7 +125,8 @@ def train(
                     )
 
         scheduler.step()
-        plot_history(history)
+        if kwargs.get("plot_each_step", True):
+            plot_history(history)
 
     elapsed = time.time() - init_time
     logger.info(f"Finished in {elapsed / 60:.1f} min | Best: {best_test_acc:.2f}%")

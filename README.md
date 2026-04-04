@@ -50,20 +50,9 @@ CIFAR-100-Classification/
 
 ## Training
 
-You can train the model using the main notebook:
+You can train the model using the main notebook `notebooks/main.ipynb`. It is designed such that it can be ran in cloud services (like the one I used, Modal, or Google Colab), clonning this exact repository to get all the source code. It also stores all the artifacts there (to use Google Colab, steup the drive mount).
 
-1. Open `notebooks/train_smallresnet.ipynb`.
-2. Ensure the required packages are installed:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Set training parameters if needed (epochs, batch size, learning rate).
-4. Run the notebook cells sequentially to:
-    - Load CIFAR-100
-    - Apply data augmentation
-    - Train SmallResNet
-    - Save the trained model and plots
-5. Evaluate on the test set to see metrics and Top-k accuracies.
+To run locally just remove the first cell and adjust the paths in `configs/config.py`.
 
 ---
 

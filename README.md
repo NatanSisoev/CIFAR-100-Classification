@@ -50,7 +50,9 @@ CIFAR-100-Classification/
 
 ## Training
 
-You can train the model using the main notebook `notebooks/main.ipynb`. It is designed such that it can be ran in cloud services (like the one I used, Modal, or Google Colab), clonning this exact repository to get all the source code. It also stores all the artifacts there (to use Google Colab, steup the drive mount).
+You can train the model using the main notebook `notebooks/main.ipynb`.
+
+It is designed such that it can be ran in cloud services (like the one I used, Modal, or Google Colab), clonning this exact repository to get all the source code. It also stores all the artifacts there (to use Google Colab, setup the drive mount).
 
 To run locally just remove the first cell and adjust the paths in `configs/config.py`.
 

@@ -48,6 +48,25 @@ CIFAR-100-Classification/
 
 ---
 
+## Training
+
+You can train the model using the main notebook:
+
+1. Open `notebooks/train_smallresnet.ipynb`.
+2. Ensure the required packages are installed:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Set training parameters if needed (epochs, batch size, learning rate).
+4. Run the notebook cells sequentially to:
+    - Load CIFAR-100
+    - Apply data augmentation
+    - Train SmallResNet
+    - Save the trained model and plots
+5. Evaluate on the test set to see metrics and Top-k accuracies.
+
+---
+
 ## Author
 
 Natan Sisoev
